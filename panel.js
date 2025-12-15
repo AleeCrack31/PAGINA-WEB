@@ -97,18 +97,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   async function updateServerInicio() {
     try {
-      const status = await apiGet('/api/server/status');
-      const players = await apiGet('/api/players/list');
-      const cpuRam = await apiGet('/api/server/cpu_ram');
-      const tps = await apiGet('/api/server/tps');
+      const status = await apiGet('/api/minecraft/status');
+      const players = status.online ? await apiGet('/api/minecraft/players') : [];
 
       serverSubContent.innerHTML = `
         <div class="server-stats">
           <p><strong>Estado:</strong> ${status.online ? '🟢 Online' : '🔴 Offline'}</p>
-          <p><strong>Jugadores conectados:</strong> ${players.length}</p>
+          <p><strong>Jugadores conectados:</strong> ${players.length} / ${status.maxPlayers ?? '?'}</p>
           <ul>${players.map(p => `<li>${p.name}</li>`).join('')}</ul>
-          <p><strong>CPU:</strong> ${cpuRam.cpu}% | <strong>RAM:</strong> ${cpuRam.ram}%</p>
-          <p><strong>TPS:</strong> ${tps.tps}</p>
+          <p><strong>CPU:</strong> ${status.cpu}% | <strong>RAM:</strong> ${status.ram}%</p>
+          <p><strong>Uptime:</strong> ${status.uptime}</p>
           <div class="server-buttons">
             <button id="saveBtn" ${userRole !== 'admin' ? 'disabled' : ''}>Guardar</button>
             <button id="stopBtn" ${userRole !== 'admin' ? 'disabled' : ''}>Apagar</button>
@@ -141,7 +139,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   async function loadPlayers() {
     playersGrid.innerHTML = 'Cargando jugadores...';
     try {
-      const players = await apiGet('/api/players/list');
+      const players = await apiGet('/api/minecraft/players');
       playersGrid.innerHTML = '';
       players.forEach(p => {
         const card = document.createElement('div');

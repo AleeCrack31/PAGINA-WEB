@@ -241,12 +241,82 @@ app.post('/api/rcon/command', requireAuth, async (req, res) => {
   }
 });
 
-app.get('/api/server/status', async (req, res) => {
+// ------- Datos del servidor de Minecraft --------
+const fetch = (...args) => import('node-fetch').then(({ default: fetchFn }) => fetchFn(...args));
+
+function parsePlayerList(rawList) {
+  const match = rawList.match(/There are (\d+) of a max of (\d+) players online: (.*)/i);
+  const names = match && match[3].trim() ? match[3].split(',').map(n => n.trim()).filter(Boolean) : [];
+  return {
+    online: !!match,
+    onlinePlayers: names,
+    maxPlayers: match ? Number(match[2]) : 0,
+  };
+}
+
+async function fetchPlayerProfiles(names) {
+  return Promise.all(names.map(async (name) => {
+    try {
+      const uuidRes = await fetch(`https://api.mojang.com/users/profiles/minecraft/${name}`);
+      if (!uuidRes.ok) throw new Error('No UUID');
+      const uuidData = await uuidRes.json();
+      return {
+        name,
+        uuid: uuidData.id,
+        skin: `https://mineskin.eu/armor/body/${name}/100.png`,
+      };
+    } catch (err) {
+      console.error(`No se pudo obtener perfil de ${name}:`, err.message);
+      return { name, uuid: null, skin: null };
+    }
+  }));
+}
+
+function getSystemUsage() {
+  const os = require('os');
+  const cpu = os.loadavg()[0];
+  const totalMem = os.totalmem();
+  const usedMem = totalMem - os.freemem();
+  const ramPercentage = (usedMem / totalMem) * 100;
+
+  return {
+    cpu: cpu.toFixed(2),
+    ram: ramPercentage.toFixed(2),
+  };
+}
+
+app.get('/api/minecraft/status', requireAuth, async (req, res) => {
   try {
-    const out = await rconSend('list');
-    res.json({ online: true, raw: out });
+    const listRaw = await rconSend('list');
+    const list = parsePlayerList(listRaw);
+    const uptimeSeconds = Math.round(process.uptime());
+    const hours = Math.floor(uptimeSeconds / 3600);
+    const minutes = Math.floor((uptimeSeconds % 3600) / 60);
+    const seconds = uptimeSeconds % 60;
+
+    res.json({
+      online: true,
+      raw: listRaw,
+      players: list.onlinePlayers,
+      maxPlayers: list.maxPlayers,
+      uptime: `${hours}h ${minutes}m ${seconds}s`,
+      ...getSystemUsage(),
+    });
   } catch (e) {
-    res.json({ online: false, raw: e.message });
+    console.error('Error obteniendo estado del servidor:', e.message);
+    res.json({ online: false, raw: e.message, players: [], maxPlayers: 0, uptime: '0s', ...getSystemUsage() });
+  }
+});
+
+app.get('/api/minecraft/players', requireAuth, async (req, res) => {
+  try {
+    const listRaw = await rconSend('list');
+    const { onlinePlayers } = parsePlayerList(listRaw);
+    const playerData = await fetchPlayerProfiles(onlinePlayers);
+    res.json(playerData);
+  } catch (e) {
+    console.error('Error obteniendo lista de jugadores:', e.message);
+    res.status(500).json({ error: 'No se pudo obtener jugadores' });
   }
 });
 
@@ -394,8 +464,6 @@ app.get('/api/backups/list', requireAuth, async (req, res) => {
 app.use('/backups', express.static(BACKUPS_DIR));
 
 // -------- PLAYERS ----------
-const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
-
 app.get('/api/players/list', requireAuth, async (req, res) => {
   try {
     // Usa RCON para obtener lista de jugadores conectados
