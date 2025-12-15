@@ -1,0 +1,162 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>ALEE — Login</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Poppins:wght@400;600&display=swap');
+
+    body {
+      background: radial-gradient(circle at center, #0a0a0a 0%, #000 100%);
+      color: white;
+      font-family: 'Poppins', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .intro {
+      position: absolute;
+      top: 45%;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 4rem;
+      letter-spacing: 4px;
+      opacity: 0;
+      animation: fadeUp 2.5s ease forwards;
+    }
+
+    @keyframes fadeUp {
+      0% { opacity: 0; transform: translateY(40px); }
+      50% { opacity: 1; transform: translateY(0); }
+      100% { opacity: 0; transform: translateY(-50px); }
+    }
+
+    .login-wrap {
+      opacity: 0;
+      animation: showLogin 1s ease forwards;
+      animation-delay: 2.5s;
+    }
+
+    @keyframes showLogin {
+      to { opacity: 1; }
+    }
+
+    .login-box {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 2rem 3rem;
+      border-radius: 20px;
+      box-shadow: 0 0 25px rgba(255, 255, 255, 0.1);
+      text-align: center;
+    }
+
+    h1 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 2.2rem;
+      margin-bottom: 1rem;
+      color: #00ffff;
+      text-shadow: 0 0 10px #00ffff;
+    }
+
+    input {
+      width: 100%;
+      margin: 10px 0;
+      padding: 10px;
+      border: none;
+      border-radius: 10px;
+      outline: none;
+      background: rgba(255,255,255,0.1);
+      color: white;
+    }
+
+    button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 10px;
+      background: #00ffff;
+      color: #000;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background: #00cccc;
+    }
+
+    .auth-form {
+      display: none;
+    }
+
+    .auth-form.active {
+      display: block;
+    }
+
+    .switch-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .switch-buttons button {
+      flex: 1;
+    }
+
+  </style>
+</head>
+<body>
+  <div class="intro">ALEE</div>
+
+  <div class="login-wrap">
+    <div class="login-box">
+      <h1>ALEE</h1>
+
+      <div class="switch-buttons">
+        <button id="showLogin">Acceso</button>
+        <button id="showRegister">Registro</button>
+      </div>
+
+      <div id="forms">
+        <form id="loginForm" class="auth-form">
+          <input name="email" type="email" placeholder="Correo" required>
+          <input name="password" type="password" placeholder="Contraseña" required>
+          <button type="submit">Entrar</button>
+        </form>
+
+        <form id="regForm" class="auth-form">
+          <input name="game_name" placeholder="Nombre del juego" required>
+          <input name="email" type="email" placeholder="Correo" required>
+          <input name="password" type="password" placeholder="Contraseña" required>
+          <button type="submit">Registrarme</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/auth.js"></script>
+  <script>
+    const loginForm = document.querySelector("#loginForm");
+    const regForm = document.querySelector("#regForm");
+    const showLogin = document.querySelector("#showLogin");
+    const showRegister = document.querySelector("#showRegister");
+
+    // Mostrar login por defecto
+    window.addEventListener("DOMContentLoaded", () => {
+      loginForm.classList.add("active");
+    });
+
+    showLogin.addEventListener("click", () => {
+      loginForm.classList.add("active");
+      regForm.classList.remove("active");
+    });
+
+    showRegister.addEventListener("click", () => {
+      regForm.classList.add("active");
+      loginForm.classList.remove("active");
+    });
+  </script>
+</body>
+</html>

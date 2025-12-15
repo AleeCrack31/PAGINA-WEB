@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>MCPANEL — Panel</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div class="topbar">
+  <div id="welcome">Panel</div>
+  <div>
+    <button id="btnInfo">Información pública</button>
+    <button id="btnLogout">Cerrar sesión</button>
+  </div>
+</div>
+
+<div class="layout">
+  <!-- Sidebar -->
+  <nav class="sidebar">
+    <ul>
+      <li data-section="server" class="active">Servidor</li>
+      <li data-section="players">Jugadores</li>
+      <li data-section="mosaics">Mosaicos</li>
+      <li data-section="files">Archivos</li>
+      <li data-section="backups">Backups</li>
+    </ul>
+  </nav>
+
+  <!-- Contenido principal -->
+  <div class="content">
+    <!-- Sección Servidor -->
+    <section id="server" class="section active">
+      <h2>Servidor — Inicio</h2>
+      <div id="serverSubContent"></div>
+      <div class="subtabs">
+        <button data-sub="inicio" class="active">Inicio</button>
+        <button data-sub="consola">Consola</button>
+        <button data-sub="archivos">Archivos</button>
+        <button data-sub="mundos">Mundos</button>
+        <button data-sub="backups">Backups</button>
+      </div>
+    </section>
+
+    <!-- Sección Jugadores -->
+    <section id="players" class="section hidden">
+      <h2>Jugadores</h2>
+      <div id="playersGrid" class="grid"></div>
+    </section>
+
+    <!-- Sección Mosaicos -->
+    <section id="mosaics" class="section hidden">
+      <h2>Mosaicos</h2>
+      <div id="mosaicControls">
+        <form id="mosaicForm">
+          <input name="title" placeholder="Título" required>
+          <input name="img_url" placeholder="URL imagen (opcional)">
+          <textarea name="content" placeholder="Descripción"></textarea>
+          <label><input type="checkbox" name="public" checked> Público</label>
+          <button type="submit">Crear</button>
+        </form>
+      </div>
+      <div id="mosaicsList" class="grid"></div>
+    </section>
+
+    <!-- Sección Archivos -->
+    <section id="files" class="section hidden">
+      <h2>Archivos del servidor</h2>
+      <div id="fileBrowser"></div>
+    </section>
+
+    <!-- Sección Backups -->
+    <section id="backups" class="section hidden">
+      <h2>Backups</h2>
+      <div id="backupList"></div>
+      <button id="createBackupBtn">Crear Backup</button>
+    </section>
+  </div>
+</div>
+
+<!-- Modal único -->
+<div id="modal" class="modal hidden">
+  <div class="modal-content">
+    <button id="closeModal">Cerrar</button>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<script src="/js/panel.js"></script>
+</body>
+</html>
+
